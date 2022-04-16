@@ -21,15 +21,22 @@ class ViewController: UIViewController,UITableViewDelegate {
         
         // Realmのfunctionでデータを取得。functionを更に追加することで、フィルターもかけられる
         self.todoItems = realm_1.objects(TodoModel.self)
+        todoTable.reloadData()
         
     }
     
     // 画面遷移した際に、リロードして全てのリストを表示
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        // Realmのインスタンスを生成
+        let realm_1 = try! Realm()
+        
+        // Realmのfunctionでデータを取得。functionを更に追加することで、フィルターもかけられる
+        self.todoItems = realm_1.objects(TodoModel.self)
         
         todoTable.reloadData()
     }
+    
 }
 extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -43,4 +50,15 @@ extension ViewController: UITableViewDataSource {
         return todoCell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let storyboard: UIStoryboard = self.storyboard!
+        let next = storyboard.instantiateViewController(withIdentifier: "EditController") as! EditController
+        next.toDoIdEdit = self.todoItems[indexPath.row].toDoId
+        next.todoItem = self.todoItems[indexPath.row].todoItems
+        next.deadLine = self.todoItems[indexPath.row].deadLineDate
+        
+        
+        self.present(next, animated: true, completion: nil)
+    }
 }

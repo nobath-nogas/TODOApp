@@ -23,10 +23,11 @@ class AddController: UIViewController, UITextFieldDelegate {
             
             self.todoItems = realm_1.objects(TodoModel.self)
         }
-    
+    //追加画面でTodoをRealmに登録する
     @IBAction func TodoAddButton(_ sender: Any) {
         
         let todoItem:TodoModel = TodoModel()
+        todoItem.toDoId = createTodoId()
         todoItem.todoItems = self.TodoTextField.text
         todoItem.deadLineDate = self.deadLineTextField.text
         
@@ -39,6 +40,12 @@ class AddController: UIViewController, UITextFieldDelegate {
         TodoTextField.text = ""
         deadLineTextField.text = ""
 
+    }
+    //連番でIdを生成する
+    func createTodoId() -> Int{
+        let realm_3 = try! Realm()
+        let toDoIdList = realm_3.objects(TodoModel.self).sorted(byKeyPath: "toDoId", ascending: false).first
+        return toDoIdList?.value(forKey: "toDoId") as! Int + 1
     }
 
 }

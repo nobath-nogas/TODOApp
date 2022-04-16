@@ -12,9 +12,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
-        print(Realm.Configuration.defaultConfiguration.fileURL!)
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        let config = Realm.Configuration(
+                schemaVersion: 1,
+                
+                migrationBlock: { migration, oldSchemaVersion in
+                    if(oldSchemaVersion < 1) {
+                    }
+               })
+        Realm.Configuration.defaultConfiguration = config
+        let realm = try!Realm()
+        print(realm)
+        print(config, "Realm Version")
         return true
     }
 
