@@ -6,32 +6,39 @@
 //
 
 import UIKit
+import RealmSwift
 
 var TodoContents = [String]()
 
-class AddController: UIViewController {
+class AddController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var TodoTextField: UITextField!
-    @IBAction func TodoAddButton(_ sender: Any) {
-        TodoContents.append(TodoTextField.text!)
-        TodoTextField.text = ""
-        UserDefaults.standard.set( TodoContents, forKey: "TodoList" )
-    }
+    @IBOutlet weak var deadLineTextField: UITextField!
+    
+    var todoItems: Results<TodoModel>!
     
     override func viewDidLoad() {
-        super.viewDidLoad()
+            super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
-    }
+            let realm_1 = try! Realm()
+            
+            self.todoItems = realm_1.objects(TodoModel.self)
+        }
     
+    @IBAction func TodoAddButton(_ sender: Any) {
+        
+        let todoItem:TodoModel = TodoModel()
+        todoItem.todoItems = self.TodoTextField.text
+        todoItem.deadLineDate = self.deadLineTextField.text
+        
+        let realm_2 = try! Realm()
+        
+        try! realm_2.write{
+            realm_2.add(todoItem)
+        }
+        
+        TodoTextField.text = ""
+        deadLineTextField.text = ""
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
     }
-    */
 
 }
