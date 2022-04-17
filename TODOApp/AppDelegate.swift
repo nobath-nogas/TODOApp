@@ -7,12 +7,24 @@
 
 import UIKit
 import RealmSwift
+import UserNotifications
+import os
+
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+    var window: UIWindow?
 
-
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        // 通知許可の取得
+        UNUserNotificationCenter.current().requestAuthorization(
+            options: [.alert, .sound, .badge]){
+                (granted, _) in
+                if granted{
+                    UNUserNotificationCenter.current().delegate = self
+                }
+            }
+        
         let config = Realm.Configuration(
                 schemaVersion: 1,
                 
@@ -26,7 +38,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print(config, "Realm Version")
         return true
     }
-
+    
+ 
+    
     // MARK: UISceneSession Lifecycle
 
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
@@ -40,4 +54,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
 }
+
+
 

@@ -45,7 +45,8 @@ class AddController: UIViewController, UITextFieldDelegate {
     func createTodoId() -> Int{
         let realm_3 = try! Realm()
         let toDoIdList = realm_3.objects(TodoModel.self).sorted(byKeyPath: "toDoId", ascending: false).first
-        return toDoIdList?.value(forKey: "toDoId") as! Int + 1
+        guard let toDoId = toDoIdList?.value(forKey: "toDoId") as? Int else { return 0 }
+        return toDoId
     }
 
 }
