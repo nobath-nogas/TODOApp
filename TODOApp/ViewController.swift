@@ -54,7 +54,7 @@ class ViewController: UIViewController,UITableViewDelegate,UNUserNotificationCen
         notificationContent.body = "通知の本文"
         notificationContent.sound = .default
         notificationContent.badge = 1 //バッチをアプリアイコンにつける場合は必要。バッチの数字を指定。
-        let notificationTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false) //ここでtimeIntervalに秒数を指定
+        let notificationTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 300, repeats: false) //ここでtimeIntervalに秒数を指定
         let request = UNNotificationRequest(identifier: "notice id", content: notificationContent, trigger: notificationTrigger)
         let notificationCenter = UNUserNotificationCenter.current()
         notificationCenter.add(request, withCompletionHandler: nil)
