@@ -114,6 +114,24 @@ extension ViewController: UITableViewDataSource {
         todoCell.textLabel?.text = item.todoItems
         return todoCell
     }
+    //セルの編集許可
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool
+    {
+        return true
+    }
+    
+    //スワイプしたセルを削除　※arrayNameは変数名に変更してください
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == UITableViewCell.EditingStyle.delete {
+            let realm = try! Realm()
+            try! realm.write {
+                realm.delete(todoItems[indexPath.row])
+                tableView.deleteRows(at: [indexPath], with: .fade)
+            }
+            todoTable.reloadData()
+        }
+    }
+    
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
@@ -125,4 +143,6 @@ extension ViewController: UITableViewDataSource {
         
         self.present(next, animated: true, completion: nil)
     }
+    
+    
 }
