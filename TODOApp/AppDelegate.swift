@@ -26,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             }
         
         let config = Realm.Configuration(
-                schemaVersion: 5,
+                schemaVersion: 7,
                 
                 migrationBlock: { migration, oldSchemaVersion in
                     if(oldSchemaVersion < 1) {

@@ -7,6 +7,7 @@
 
 import UIKit
 import RealmSwift
+import UserNotifications
 import os
 
 class ViewController: UIViewController,UITableViewDelegate,UNUserNotificationCenterDelegate {
@@ -15,6 +16,7 @@ class ViewController: UIViewController,UITableViewDelegate,UNUserNotificationCen
     var todoItems: Results<TodoModel>!
     var request:UNNotificationRequest!
     var remindContentsList:[String] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Realmのインスタンスを生成
@@ -22,11 +24,15 @@ class ViewController: UIViewController,UITableViewDelegate,UNUserNotificationCen
         //Realmから期限を抽出する
         let todoModels = realm_1.objects(TodoModel.self)
         
-        //期限の時間を現時刻の30分以内であるかをチェック
+        //期限の時間の30分前にプッシュ通知する
         for toDoList in todoModels{
             let deadline = toDoList.deadLineDate
             //期限をdate型に変換する
             let dateFormatter = DateFormatter()
+        
+            // タイムゾーン設定（端末設定によらず、どこの地域の時間帯なのかを指定する）
+            dateFormatter.timeZone = TimeZone(abbreviation: "JST")
+            
             dateFormatter.dateFormat = "yyyy/MM/dd HH:mm"
             var convDeadline = dateFormatter.date(from: "9999/99/99 23:59")
             
@@ -36,38 +42,21 @@ class ViewController: UIViewController,UITableViewDelegate,UNUserNotificationCen
                 
             }
             
-            //現在時刻の設定
-            let tempNowDate = dateFormatter.string(from: Date())
-            let nowDate = dateFormatter.date(from: tempNowDate)
+            // 通知日時を期限の30分前に設定する
+            let date30 = Calendar.current.date(byAdding: .minute, value: -30, to: convDeadline!)
             
-         
-            if let deadlineDate = convDeadline {
-                let elapsedTime = nowDate!.timeIntervalSince(deadlineDate)
-                //期限が30分以内であればcontentsListに設定
-                if elapsedTime <= 60000{
-                    remindContentsList.append(toDoList.todoItems ?? "")
-                    
-                }
-            }else{
-                //何もしない
-            }
-            
-        }
-        //リマインドするTODOがあればプッシュ通知する
-        if !remindContentsList.isEmpty {
-            var contents:String = ""
-            for i in remindContentsList {
-                contents += i + "\n"
-            }
             //プッシュ通知の内容設定
             let notificationContent = UNMutableNotificationContent()
             notificationContent.title = "リマインダー"
             notificationContent.subtitle = "期限が30分以内のタスク"
             notificationContent.sound = .default
             notificationContent.badge = (todoModels.count) as NSNumber//バッチをアプリアイコンにつける場合は必要。バッチの数字を指定。期限が30分以内のタスクの数分だけ表示する
-            notificationContent.body = contents
-            let notificationTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 3, repeats: false) //ここでtimeIntervalに秒数を指定
-            let request = UNNotificationRequest(identifier: "notice id", content: notificationContent, trigger: notificationTrigger)
+            notificationContent.body = toDoList.todoItems ?? ""
+            let notificationTrigger = UNCalendarNotificationTrigger(dateMatching: Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date30!), repeats: false)
+            print(notificationTrigger)
+            let request = UNNotificationRequest(identifier: String(toDoList.toDoId), content: notificationContent, trigger: notificationTrigger)
+            
+            //プッシュ通知表示
             let notificationCenter = UNUserNotificationCenter.current()
             notificationCenter.add(request, withCompletionHandler: nil)
             notificationCenter.delegate = self
@@ -133,7 +122,6 @@ extension ViewController: UITableViewDataSource {
         next.toDoIdEdit = self.todoItems[indexPath.row].toDoId
         next.todoItem = self.todoItems[indexPath.row].todoItems
         next.deadLine = self.todoItems[indexPath.row].deadLineDate
-        
         
         self.present(next, animated: true, completion: nil)
     }

@@ -83,7 +83,6 @@ class AddController: UIViewController, UITextFieldDelegate {
             
             if let date = dataFormatter.date(from: dateString) {
             // OK
-                
             //yyyy/MM/dd HH:mmに変換できなかった場合警告
             } else {
                 alertMessage += "yyyy/MM/dd HH:mmで入力してください。"
