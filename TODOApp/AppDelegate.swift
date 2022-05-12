@@ -24,6 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                     UNUserNotificationCenter.current().delegate = self
                 }
             }
+      
         
         let config = Realm.Configuration(
                 schemaVersion: 7,
@@ -35,7 +36,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         Realm.Configuration.defaultConfiguration = config
         let realm = try!Realm()
         print(realm)
-        print(config, "Realm Version")
+        print(config, "Realm Version")        
+        
         return true
     }
     
@@ -51,7 +53,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
         
     }
-
 
 }
 

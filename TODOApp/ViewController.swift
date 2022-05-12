@@ -50,9 +50,9 @@ class ViewController: UIViewController,UITableViewDelegate,UNUserNotificationCen
             notificationContent.title = "リマインダー"
             notificationContent.subtitle = "期限が30分以内のタスク"
             notificationContent.sound = .default
-            notificationContent.badge = (todoModels.count) as NSNumber//バッチをアプリアイコンにつける場合は必要。バッチの数字を指定。期限が30分以内のタスクの数分だけ表示する
             notificationContent.body = toDoList.todoItems ?? ""
             let notificationTrigger = UNCalendarNotificationTrigger(dateMatching: Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date30!), repeats: false)
+
             print(notificationTrigger)
             let request = UNNotificationRequest(identifier: String(toDoList.toDoId), content: notificationContent, trigger: notificationTrigger)
             
@@ -71,13 +71,12 @@ class ViewController: UIViewController,UITableViewDelegate,UNUserNotificationCen
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        
-        os_log("Notified")
         // アプリ起動時も通知を行う
         if #available(iOS 14.0, *) {
-            completionHandler([.banner, .list,.badge, .sound])
+            completionHandler([.banner, .list, .sound])
+            
         } else {
-            completionHandler([.alert, .list,.badge,.sound])
+            completionHandler([.alert, .list,.sound])
         }
     }
     @IBAction func setButton(_ sender: Any) {
@@ -89,7 +88,6 @@ class ViewController: UIViewController,UITableViewDelegate,UNUserNotificationCen
         center.add(request)
     }
     
-    
     // 画面遷移した際に、リロードして全てのリストを表示
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -99,6 +97,7 @@ class ViewController: UIViewController,UITableViewDelegate,UNUserNotificationCen
         // Realmのfunctionでデータを取得。functionを更に追加することで、フィルターもかけられる
         self.todoItems = realm_1.objects(TodoModel.self)
         
+        viewDidLoad()
         todoTable.reloadData()
     }
     
@@ -109,9 +108,11 @@ extension ViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let todoCell:UITableViewCell = tableView.dequeueReusableCell(withIdentifier: "TodoCell", for: indexPath)
-        let item:TodoModel = self.todoItems[(indexPath as NSIndexPath).row];
+        let item:TodoModel = self.todoItems[indexPath.row]
         todoCell.textLabel?.text = item.todoItems
+        todoCell.detailTextLabel?.text = item.deadLineDate
         return todoCell
     }
     //セルの編集許可
